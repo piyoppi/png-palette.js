@@ -1,0 +1,18 @@
+<!DOCTYPE HTML>
+<html>
+  <head>
+    <meta charset="UTF-8">
+    <title>Example</title>
+    <script src="../dist/entry.bundle.js"></script>
+  </head>
+  <body>
+    <script>
+      var image = new Image();
+      image.onload = function() {
+        var pngConv = new PngConv(image);
+        console.log(pngConv.extractColors()); 
+      }
+      image.src = '/examples/niwatori.png';
+    </script>
+  </body>
+</html>
