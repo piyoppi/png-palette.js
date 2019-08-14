@@ -10,7 +10,7 @@
       var image = new Image();
       image.onload = function() {
         var pngConv = new PngConv(image);
-        console.log(pngConv.extractColors()); 
+        pngConv.convert();
       }
       image.src = '/examples/niwatori.png';
     </script>

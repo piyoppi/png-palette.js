@@ -16,24 +16,27 @@ module.exports = {
   output: {
     filename: '[name].bundle.js'
   },
-  plugins: [
-    new webpack.ProvidePlugin({
-      PngConv: './src/png_conv.js'
-    }),
-  ],
   module: {
     rules: [
       {
         test: /\.js$/, 
         exclude: file => (
-          /node_modules/.test(file)
+          /node_modules/.test(file) &&
+          !/\.js/.test(file)
         ),
         use: [
           {
             loader: 'babel-loader',
             options: {
               plugins: babelPlugins,
-              presets: ['@babel/preset-env'],
+              presets: [
+                [
+                  '@babel/preset-env', {
+                    useBuiltIns: "usage",
+                    corejs: 3
+                  }
+                ]
+              ],
             }
           }
         ]

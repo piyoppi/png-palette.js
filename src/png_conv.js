@@ -1,3 +1,6 @@
+import PngBytes from './png_bytes';
+import IdhrChunk, {ColorType} from './idhr_chunk';
+
 export default class PngConv {
   constructor(img) {
     this.img = img;
@@ -28,5 +31,27 @@ export default class PngConv {
     this.extractedColors = Object.entries(colorList).map( entry => entry[1] );
 
     return this.extractedColors;
+  }
+
+  _calcBufferSize() {
+    return this.img.width * this.img.height;
+  }
+
+  *_pngSignature() {
+    yield* [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
+  }
+
+  convert() {
+    this.extractColors();
+
+    const bytes = new PngBytes(this._calcBufferSize());
+
+    bytes.write(this._pngSignature());
+
+    const idhrChunk = new IdhrChunk(this.img.width, this.img.height, 8, ColorType.palette | ColorType.color);
+    idhrChunk.write(bytes);
+
+    const blob = new Blob([bytes.buffer], {type: 'image/png'});
+    console.log(bytes.buffer);
   }
 }

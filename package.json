@@ -23,7 +23,6 @@
     "webpack": "^4.30.0",
     "webpack-cli": "^3.3.1"
   },
-  "dependencies": {},
   "jest": {
     "moduleFileExtensions": [
       "js"
@@ -32,5 +31,9 @@
       "node_modules",
       "./"
     ]
+  },
+  "dependencies": {
+    "core-js": "^3.2.1",
+    "regenerator-runtime": "^0.13.3"
   }
 }
