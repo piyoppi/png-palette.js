@@ -1,4 +1,4 @@
-import IdhrChunk, { ColorType } from './../src/idhr_chunk'
+import IdhrChunk, { ColorType } from './../src/idhr_chunk';
 import PngBytes from './../src/png_bytes';
 
 describe('_imageWidth', () => {

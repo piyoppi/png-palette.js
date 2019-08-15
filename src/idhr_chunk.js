@@ -1,4 +1,4 @@
-import CrcCalculator from './crc_calculator'
+import CrcCalculator from './crc_calculator';
 
 export const ColorType = {
   palette: 1,
@@ -27,7 +27,7 @@ export default class IdhrChunk {
     yield* [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
   }
 
-  *_chunkIdhrLength() {
+  *_chunkLength() {
     yield* [0x00, 0x00, 0x00, 0x0D];
   }
 
@@ -71,7 +71,7 @@ export default class IdhrChunk {
   }
 
   write(bytes) {
-    bytes.write(this._chunkIdhrLength());
+    bytes.write(this._chunkLength());
     bytes.write(this._chunkData());
     bytes.write(this._crc());
   }
