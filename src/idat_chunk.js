@@ -35,6 +35,7 @@ export default class IdatChunk {
   }
 
   get rawDataLength() {
+    const cycle = Math.ceil(this.data.length / 32768);
     return Math.ceil((cycle * (32 + 3) + this.data.length * 8 + 32) / 8);
   }
 
