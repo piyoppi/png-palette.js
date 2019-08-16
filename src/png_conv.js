@@ -1,6 +1,8 @@
 import PngBytes from './png_bytes';
 import IdhrChunk, {ColorType} from './idhr_chunk';
 import PlteChunk from './plte_chunk';
+import IdatChunk from './idat_chunk';
+import IendChunk from './iend_chunk';
 
 export default class PngConv {
   constructor(img) {
@@ -46,13 +48,18 @@ export default class PngConv {
     this.extractColors();
 
     const bytes = new PngBytes(this._calcBufferSize());
-
-    bytes.write(this._pngSignature());
+    let data = [];
 
     const idhrChunk = new IdhrChunk(this.img.width, this.img.height, 8, ColorType.palette | ColorType.color);
     const plteChunk = new PlteChunk(this.extractedColors);
+    const IdatChunk = new IdatChunk(data);
+    const IendChunk = new IendChunk();
+
+    bytes.write(this._pngSignature());
     idhrChunk.write(bytes);
     plteChunk.write(bytes);
+    idatChunk.write(bytes);
+    iendChunk.write(bytes);
 
     const blob = new Blob([bytes.buffer], {type: 'image/png'});
   }

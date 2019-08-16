@@ -1,13 +1,9 @@
 import CrcCalculator from './crc_calculator';
 import Adler32 from './adler32';
+import PngBytes from './../src/png_bytes';
 
 export default class IdatChunk {
-  constructor(width, height, depth, colorType, palette, data, option = {}) {
-    this.width = width;
-    this.height = height;
-    this.depth = depth;
-    this.colorType = colorType;
-    this.palette = palette;
+  constructor(data, option = {}) {
     this.data = data;
 
     this.fdict = option.fdict || 0;
@@ -17,6 +13,10 @@ export default class IdatChunk {
 
   _chunkType() {
     return [0x49, 0x44, 0x41, 0x54];
+  }
+
+  *_chunkLength(dataLength) {
+    yield* [dataLength >>> 24, dataLength >>> 16, dataLength >>> 8, dataLength].map( val => val & 0x000000FF);
   }
 
   _cmf() {
@@ -34,8 +34,14 @@ export default class IdatChunk {
     return Math.pow(this.slideWindowMode + 8, 2);
   }
 
-  writeRaw(bytes) {
+  get rawDataLength() {
+    return Math.ceil((cycle * (32 + 3) + this.data.length * 8 + 32) / 8);
+  }
+
+  _raw() {
     const cycle = Math.ceil(this.data.length / 32768);
+    const byteLen = this.rawDataLength;
+    const bytes = new PngBytes(byteLen);
     let writeBitCount = 0;
     let dataCursor = 0;
 
@@ -52,15 +58,21 @@ export default class IdatChunk {
         bytes.writeNonBoundary(this.data[dataCursor++], 8); 
       }
     }
+
+    bytes.writeNonBoundary(Adler32.calc(this.data), 32);
+    return bytes;
   }
 
-  *_crc() {
-    const crc = CrcCalculator.calc(this._chunkDataArray());
+  write(bytes) {
+    const dataLength = this.rawDataLength
+    const chunkData = this._chunkType().concat(Array.from(this._raw()));
+    bytes.write(this._chunkLength(this.rawDataLength));
+    bytes.write(chunkData[Symbol.iterator]());
+    bytes.write(this._crc(chunkData));
+  }
+
+  *_crc(data) {
+    const crc = CrcCalculator.calc(data);
     yield* [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
-  }
-
-  *_adler32() {
-    const adler32 = Adler32.calc(this.data);
-    yield* [adler32 >>> 24, adler32 >>> 16, adler32 >>> 8, adler32].map( val => val & 0x000000FF);
   }
 }

@@ -22,7 +22,7 @@ export default class PngBytes {
     const bitLengthInlastByte = (this.offset + bitlen) % 8;
 
     let offset = this.offset;
-    let buf = data;
+    let buf = data & Math.pow(2, bitlen) - 1;
     let currentBitlen = bitlen;
 
     for(let i=0; i<cycle; i++) {

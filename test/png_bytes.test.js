@@ -52,10 +52,18 @@ describe('writeNonBoundary', () => {
   });
 
   test('written bytes when has offset', () => {
-    const data = new PngBytes(3);
-    data.writeNonBoundary(0b001, 3);
-    data.writeNonBoundary(0b01001010010111, 14);
+    const data = new PngBytes(5);
+    data.writeNonBoundary(1, 1);
+    data.writeNonBoundary(0, 2);
+    data.writeNonBoundary(0x04, 16);
+    data.writeNonBoundary(~0x04 + 1, 16);
 
-    expect(data.bytes.toString()).toEqual([0b00101001, 0b01001011, 0b10000000].toString());
+    expect(data.bytes.toString()).toEqual([
+      0b10000000,
+      0b00000000,
+      0b10011111,
+      0b11111111,
+      0b10000000
+    ].toString());
   });
 });
