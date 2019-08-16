@@ -2,7 +2,7 @@ export default class Png {
   constructor(pixels, width, height, palette) {
     this.pixels = pixels;
     this.rawData = [];
-    this._palette = palette || [];
+    this.palette = palette || [];
     this.isPaletteMode = !!palette;
     this.width = width;
     this.height = height;
@@ -44,7 +44,7 @@ export default class Png {
       }
     }
 
-    this._palette = palette;
+    this.palette = palette;
     this.rawData = convertedData;
 
     this.isPaletteMode = true;

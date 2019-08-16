@@ -5,6 +5,10 @@ export default class PlteChunk {
     this.palette = palette;
   }
 
+  get length() {
+    return 12 + 3 * this.palette.length;
+  }
+
   *_chunkLength() {
     const length = this.palette.length * 3;
     yield* [length >>> 24, length >>> 16, length >>> 8, length].map( val => val & 0x000000FF);

@@ -1,6 +1,11 @@
 import CrcCalculator from './crc_calculator';
 import Adler32 from './adler32';
-import PngBytes from './../src/png_bytes';
+import PngBytes from './png_bytes';
+
+export const DeflateDataType = {
+  raw: 0,
+  fixedDict: 1
+}
 
 export default class IdatChunk {
   constructor(data, option = {}) {
@@ -9,6 +14,14 @@ export default class IdatChunk {
     this.fdict = option.fdict || 0;
     this.flevel = option.flevel || 2;
     this.slideWindowMode = option.slideWindowMode || 7;     // 2 ^ (slideWindowMode + 8) = actualSlideWindowSize
+    this.dataMode = DeflateDataType.raw;
+  }
+
+  get length() {
+    switch( this.dataMode ) {
+      case DeflateDataType.raw:
+        return 12 + 2 + this.rawDataLength;
+    }
   }
 
   _chunkType() {
@@ -66,7 +79,11 @@ export default class IdatChunk {
 
   write(bytes) {
     const dataLength = this.rawDataLength
-    const chunkData = this._chunkType().concat(Array.from(this._raw()));
+    const chunkData = this._chunkType()
+      .concat(this._cmf())
+      .concat(this._flg())
+      .concat(Array.from(this._raw().bytes));
+
     bytes.write(this._chunkLength(this.rawDataLength));
     bytes.write(chunkData[Symbol.iterator]());
     bytes.write(this._crc(chunkData));

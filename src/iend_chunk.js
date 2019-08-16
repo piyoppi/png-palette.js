@@ -5,6 +5,10 @@ export default class IendChunk {
     this.palette = palette;
   }
 
+  get length() {
+    return 12;
+  }
+
   *_chunkLength() {
     yield* [0x00, 0x00, 0x00, 0x00]
   }

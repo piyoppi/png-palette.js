@@ -14,6 +14,10 @@ export default class IdhrChunk {
     this.colorType = colorType;
   }
 
+  get length() {
+    return 25;
+  }
+
   _imageWidth() {
     return [this.width >>> 24, this.width >>> 16, this.width >>> 8, this.width].map( val => val & 0x000000FF);
   }

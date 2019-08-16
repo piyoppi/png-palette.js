@@ -7,7 +7,7 @@ import Png from './png'
 
 export default class PngConv {
   constructor(img) {
-    this.img = img;
+    this.img = img || null;
     this.png = null;
   }
 
@@ -25,26 +25,26 @@ export default class PngConv {
   _prepare() {
     const data = this._getPixelData();
     this.png = new Png(data, this.img.width, this.img.height);
-    this.png.convertToPaletteMode(extractedColors);
   }
 
-  _calcBufferSize() {
-    return this.img.width * this.img.height;
+  convert() {
+    if( !this.png ) this._prepare();
+
+    this.png.convertToPaletteMode();
   }
 
   *_pngSignature() {
     yield* [0x89, 0x50, 0x4E, 0x47, 0x0D, 0x0A, 0x1A, 0x0A];
   }
 
-  convert() {
-    this._prepare();
-
-    const bytes = new PngBytes(this._calcBufferSize());
-
+  fileData() {
     const idhrChunk = new IdhrChunk(this.png.width, this.png.height, 8, ColorType.palette | ColorType.color);
     const plteChunk = new PlteChunk(this.png.palette);
-    const IdatChunk = new IdatChunk(this.png.rawData);
-    const IendChunk = new IendChunk();
+    const idatChunk = new IdatChunk(this.png.rawData);
+    const iendChunk = new IendChunk();
+
+    const byteLength = 8 + idhrChunk.length + plteChunk.length + idatChunk.length + iendChunk.length;
+    const bytes = new PngBytes(byteLength);
 
     bytes.write(this._pngSignature());
     idhrChunk.write(bytes);
@@ -52,6 +52,10 @@ export default class PngConv {
     idatChunk.write(bytes);
     iendChunk.write(bytes);
 
-    const blob = new Blob([bytes.buffer], {type: 'image/png'});
+    return bytes;
+  }
+
+  blob() {
+    //const blob = new Blob([bytes.buffer], {type: 'image/png'});
   }
 }

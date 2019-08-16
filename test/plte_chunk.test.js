@@ -41,3 +41,17 @@ describe('write', () => {
     ].toString());
   });
 });
+
+describe('length', () => {
+  test('return chunk length', () => {
+    const chunk = new PlteChunk([
+      {r: 0,   g: 0,   b: 0},
+      {r: 255, g: 0,   b: 0},
+      {r: 0,   g: 255, b: 0},
+      {r: 0,   g: 0,   b: 255}
+    ]);
+    const data = new PngBytes(24);
+
+    expect(chunk.length).toEqual(24);
+  })
+});
