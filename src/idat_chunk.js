@@ -49,7 +49,7 @@ export default class IdatChunk {
 
   get rawDataLength() {
     const cycle = Math.ceil(this.data.length / 32768);
-    return Math.ceil((cycle * (32 + 3) + this.data.length * 8 + 32) / 8);
+    return cycle * 3 + 2 + this.data.length + 4
   }
 
   _raw() {
@@ -60,20 +60,19 @@ export default class IdatChunk {
     let dataCursor = 0;
 
     for( let i=0; i<cycle; i++ ) {
-      let bfinal = (cycle-1) === i;
-      bytes.writeNonBoundary(bfinal, 1); 
-      bytes.writeNonBoundary(0x00, 2); 
-
+      const bfinal = (cycle-1) === i ? 1 : 0;
       const dataLength = Math.min(this.data.length, 32768);
-      bytes.writeNonBoundary(dataLength, 16);
-      bytes.writeNonBoundary(~dataLength + 1, 16);
+      const dataLengthComplement = (~dataLength + 1) & 0xFFFF;
+      bytes.write([0x00 | bfinal]);
+      bytes.write([dataLength, dataLength >>> 8].map( val => val & 0xFF ));
+      bytes.write([dataLengthComplement, dataLengthComplement >>> 8].map( val => val & 0xFF ));
 
       for( let n=0; n<this.data.length; n++ ) {
-        bytes.writeNonBoundary(this.data[dataCursor++], 8); 
+        bytes.write([this.data[dataCursor++]]);
       }
     }
 
-    bytes.writeNonBoundary(Adler32.calc(this.data), 32);
+    bytes.write(this._adler32());
     return bytes;
   }
 
@@ -87,6 +86,11 @@ export default class IdatChunk {
     bytes.write(this._chunkLength(this.rawDataLength));
     bytes.write(chunkData);
     bytes.write(this._crc(chunkData));
+  }
+
+  _adler32() {
+    const adler32 = Adler32.calc(this.data);
+    return [adler32 >>> 24, adler32 >>> 16, adler32 >>> 8, adler32].map( val => val & 0x000000FF);
   }
 
   _crc(data) {
