@@ -11,6 +11,12 @@
       image.onload = function() {
         var pngConv = new PngConv(image);
         pngConv.convert();
+        var blob = pngConv.toBlob();
+        console.log(URL.createObjectURL(blob));
+
+        var result = new Image();
+        result.src = URL.createObjectURL(blob);
+        document.body.appendChild(result);
       }
       image.src = '/examples/niwatori.png';
     </script>

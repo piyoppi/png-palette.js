@@ -11,7 +11,7 @@ module.exports = {
   mode: 'development',
   entry: {
     png_conv: './src/png_conv.js',
-    entry: './examples/entry.js',
+    entry: './src/entry.js',
   },
   output: {
     filename: '[name].bundle.js'
@@ -21,22 +21,13 @@ module.exports = {
       {
         test: /\.js$/, 
         exclude: file => (
-          /node_modules/.test(file) &&
-          !/\.js/.test(file)
+          /node_modules/
         ),
         use: [
           {
             loader: 'babel-loader',
             options: {
-              plugins: babelPlugins,
-              presets: [
-                [
-                  '@babel/preset-env', {
-                    useBuiltIns: "usage",
-                    corejs: 3
-                  }
-                ]
-              ],
+              plugins: babelPlugins
             }
           }
         ]

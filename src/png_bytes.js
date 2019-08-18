@@ -26,7 +26,7 @@ export default class PngBytes {
     let currentBitlen = bitlen;
 
     for(let i=0; i<cycle; i++) {
-      const putValue = buf >>> Math.max(currentBitlen - (8 - offset), 0);
+      let putValue = buf >>> Math.max(currentBitlen - (8 - offset), 0);
       if( i === cycle-1 && bitLengthInlastByte > 0) {
         putValue = putValue << (8 - bitLengthInlastByte);
       }

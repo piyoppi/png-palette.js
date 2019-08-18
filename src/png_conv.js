@@ -55,7 +55,9 @@ export default class PngConv {
     return bytes;
   }
 
-  blob() {
-    //const blob = new Blob([bytes.buffer], {type: 'image/png'});
+  toBlob() {
+    const bytes = this.fileData();
+    return new Blob([bytes.buffer], {type: 'image/png'});
   }
 }
+//window.PngConv = PngConv;
