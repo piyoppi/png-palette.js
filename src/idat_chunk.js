@@ -62,7 +62,7 @@ export default class IdatChunk {
     for( let i=0; i<cycle; i++ ) {
       const bfinal = (cycle-1) === i ? 1 : 0;
       const dataLength = Math.min(this.data.length, 32768);
-      const dataLengthComplement = (~dataLength + 1) & 0xFFFF;
+      const dataLengthComplement = (~dataLength) & 0xFFFF;
       bytes.write([0x00 | bfinal]);
       bytes.write([dataLength, dataLength >>> 8].map( val => val & 0xFF ));
       bytes.write([dataLengthComplement, dataLengthComplement >>> 8].map( val => val & 0xFF ));
