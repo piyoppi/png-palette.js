@@ -9,9 +9,9 @@ export default class PlteChunk {
     return 12 + 3 * this.palette.length;
   }
 
-  *_chunkLength() {
+  _chunkLength() {
     const length = this.palette.length * 3;
-    yield* [length >>> 24, length >>> 16, length >>> 8, length].map( val => val & 0x000000FF);
+    return [length >>> 24, length >>> 16, length >>> 8, length].map( val => val & 0x000000FF);
   }
 
   _chunkType() {
@@ -34,13 +34,13 @@ export default class PlteChunk {
       .concat(this._palette());
   }
 
-  *_chunkData() {
-    yield* this._chunkDataArray();
+  _chunkData() {
+    return this._chunkDataArray();
   }
 
-  *_crc() {
+  _crc() {
     const crc = CrcCalculator.calc(this._chunkDataArray());
-    yield* [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
+    return [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
   }
 
   write(bytes) {

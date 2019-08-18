@@ -26,13 +26,13 @@ export default class IdhrChunk {
     return [this.height >>> 24, this.height >>> 16, this.height >>> 8, this.height].map( val => val & 0x000000FF);
   }
 
-  *_crc() {
+  _crc() {
     const crc = CrcCalculator.calc(this._chunkDataArray());
-    yield* [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
+    return [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
   }
 
-  *_chunkLength() {
-    yield* [0x00, 0x00, 0x00, 0x0D];
+  _chunkLength() {
+    return [0x00, 0x00, 0x00, 0x0D];
   }
 
   _chunkType() {
@@ -70,8 +70,8 @@ export default class IdhrChunk {
       .concat(this._interlace())
   }
 
-  *_chunkData() {
-    yield* this._chunkDataArray();
+  _chunkData() {
+    return this._chunkDataArray();
   }
 
   write(bytes) {

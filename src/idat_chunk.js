@@ -28,8 +28,8 @@ export default class IdatChunk {
     return [0x49, 0x44, 0x41, 0x54];
   }
 
-  *_chunkLength(dataLength) {
-    yield* [dataLength >>> 24, dataLength >>> 16, dataLength >>> 8, dataLength].map( val => val & 0x000000FF);
+  _chunkLength(dataLength) {
+    return [dataLength >>> 24, dataLength >>> 16, dataLength >>> 8, dataLength].map( val => val & 0x000000FF);
   }
 
   _cmf() {
@@ -85,12 +85,12 @@ export default class IdatChunk {
       .concat(Array.from(this._raw().bytes));
 
     bytes.write(this._chunkLength(this.rawDataLength));
-    bytes.write(chunkData[Symbol.iterator]());
+    bytes.write(chunkData);
     bytes.write(this._crc(chunkData));
   }
 
-  *_crc(data) {
+  _crc(data) {
     const crc = CrcCalculator.calc(data);
-    yield* [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
+    return [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
   }
 }

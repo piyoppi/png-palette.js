@@ -6,14 +6,14 @@ export default class PngBytes {
     this.offset = 0;
   }
 
-  write(itr) {
+  write(arr) {
     if( this.offset > 0 ) {
       this.offset = 0;
       this.cursor++;
     }
 
-    for(let val of itr) {
-      this.bytes[this.cursor++] = val;
+    for(let i=0; i<arr.length; i++) {
+      this.bytes[this.cursor++] = arr[i];
     }
   }
 

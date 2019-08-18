@@ -9,8 +9,8 @@ export default class IendChunk {
     return 12;
   }
 
-  *_chunkLength() {
-    yield* [0x00, 0x00, 0x00, 0x00]
+  _chunkLength() {
+    return [0x00, 0x00, 0x00, 0x00]
   }
 
   _chunkType() {
@@ -21,13 +21,13 @@ export default class IendChunk {
     return this._chunkType();
   }
 
-  *_chunkData() {
-    yield* this._chunkDataArray();
+  _chunkData() {
+    return this._chunkDataArray();
   }
 
-  *_crc() {
+  _crc() {
     const crc = CrcCalculator.calc(this._chunkDataArray());
-    yield* [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
+    return [crc >>> 24, crc >>> 16, crc >>> 8, crc].map( val => val & 0x000000FF);
   }
 
   write(bytes) {
