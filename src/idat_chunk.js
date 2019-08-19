@@ -78,14 +78,14 @@ export default class IdatChunk {
 
   write(bytes) {
     const dataLength = this.rawDataLength
-    const chunkData = this._chunkType()
-      .concat(this._cmf())
+    const chunkData = this._cmf()
       .concat(this._flg())
       .concat(Array.from(this._raw().bytes));
+    const chunkContent = this._chunkType().concat(chunkData);
 
-    bytes.write(this._chunkLength(this.rawDataLength));
-    bytes.write(chunkData);
-    bytes.write(this._crc(chunkData));
+    bytes.write(this._chunkLength(chunkData.length));
+    bytes.write(chunkContent);
+    bytes.write(this._crc(chunkContent));
   }
 
   _adler32() {
