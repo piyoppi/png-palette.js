@@ -1,7 +1,7 @@
 import PngBytes from './png_bytes';
 import IdhrChunk, {ColorType} from './idhr_chunk';
 import PlteChunk from './plte_chunk';
-import IdatChunk from './idat_chunk';
+import IdatChunk, {DeflateDataType} from './idat_chunk';
 import IendChunk from './iend_chunk';
 import Png from './png'
 
@@ -40,7 +40,7 @@ export default class PngConv {
   fileData() {
     const idhrChunk = new IdhrChunk(this.png.width, this.png.height, 8, ColorType.palette | ColorType.color);
     const plteChunk = new PlteChunk(this.png.palette);
-    const idatChunk = new IdatChunk(this.png.rawData);
+    const idatChunk = new IdatChunk(this.png.rawData, {dataMode: DeflateDataType.raw});
     const iendChunk = new IendChunk();
 
     const byteLength = 8 + idhrChunk.length + plteChunk.length + idatChunk.length + iendChunk.length;
