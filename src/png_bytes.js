@@ -17,6 +17,16 @@ export default class PngBytes {
     }
   }
 
+  reverse(start = 0, end = this.bytes.length) {
+    for( let i=start; i<end; i++ ) {
+      let v = this.bytes[i];
+      v = ((v >> 1) & 0x55) | ((v & 0x55) << 1);
+      v = ((v >> 2) & 0x33) | ((v & 0x33) << 2);
+      v = (v >> 4) | (v << 4);
+      this.bytes[i] = v;
+    }
+  }
+
   writeNonBoundary(data, bitlen) {
     const cycle = Math.ceil((bitlen + this.offset) / 8);
     const bitLengthInlastByte = (this.offset + bitlen) % 8;

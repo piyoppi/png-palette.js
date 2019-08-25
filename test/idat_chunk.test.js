@@ -116,7 +116,7 @@ describe('compress', () => {
       0xAA, 0x00, 0xFF, 0x00, 0xF0, 0x0F, 0x00, 0xFF, 0x00, 0xB0, 0xB0, 0x0F,
       0xF0, 0x0F, 0x00, 0xFF, 0x04
     ]);
-    const expectedBytes = new PngBytes(19);
+    const expectedBytes = new PngBytes(20);
 
     expectedBytes.writeNonBoundary(0b110, 3);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xAA).value, chunk._getFixedHuffmanCode(0xAA).bitlen);
@@ -133,7 +133,24 @@ describe('compress', () => {
     expectedBytes.writeNonBoundary(chunk._getLengthCode(4).value, chunk._getLengthCode(4).bitlen);
     expectedBytes.writeNonBoundary(chunk._getDistanceCode(8).value, chunk._getDistanceCode(8).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x04).value, chunk._getFixedHuffmanCode(0x04).bitlen);
+    expectedBytes.writeNonBoundary(0x00, 7);
+    expectedBytes.reverse();
+    expectedBytes.write(chunk._adler32());
 
+    expect(chunk.compress().bytes.toString()).toEqual(expectedBytes.bytes.toString());
+  });
+
+  test('return a compressed data', () => {
+    const chunk = new IdatChunk([
+      0x00, 0x00
+    ]);
+    const expectedBytes = new PngBytes(8);
+
+    expectedBytes.writeNonBoundary(0b110, 3);
+    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
+    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
+    expectedBytes.writeNonBoundary(0x00, 7);
+    expectedBytes.reverse();
     expectedBytes.write(chunk._adler32());
 
     expect(chunk.compress().bytes.toString()).toEqual(expectedBytes.bytes.toString());

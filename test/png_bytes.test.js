@@ -1,5 +1,25 @@
 import PngBytes from './../src/png_bytes';
 
+describe('reverse', () => {
+  test('converted to lsb', () => {
+    const data = new PngBytes(4);
+    data.write([
+      0b10101010,
+      0b11110000,
+      0b10010011,
+      0b00111100,
+    ]);
+    data.reverse();
+
+    expect(data.bytes.toString()).toEqual([
+      0b01010101,
+      0b00001111,
+      0b11001001,
+      0b00111100
+    ].toString());
+  });
+});
+
 describe('writeNonBoundary', () => {
   test('written bytes when offset is zero', () => {
     const data = new PngBytes(1);

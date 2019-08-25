@@ -210,8 +210,8 @@ export default class IdatChunk {
   }
 
   compress() {
-    const bytes = new PngBytes(5 + this.data.length);
-    let bitCounter = 3 + 32;
+    const bytes = new PngBytes(6 + this.data.length);
+    let bitCounter = 3 + 7;
 
     const bfinal = 1;
     bytes.writeNonBoundary(bfinal, 1);
@@ -268,9 +268,11 @@ export default class IdatChunk {
       }
     }
     
+    bytes.writeNonBoundary(0x00, 7);
+    bytes.reverse();
     bytes.write(this._adler32());
 
-    const byteLength = Math.ceil(bitCounter / 8);
+    const byteLength = Math.ceil(bitCounter / 8) + 4;
     const resultBytes = new PngBytes(byteLength);
     resultBytes.write(bytes.bytes, byteLength);
     this._calculatedCompressedValue = resultBytes;
@@ -286,7 +288,7 @@ export default class IdatChunk {
         chunkData = chunkData.concat(Array.from(this._raw().bytes));
         break;
       case DeflateDataType.fixedHuffman:
-        chunkData = chunkData.concat(Array.from(this.compress().bytes));
+        chunkData = chunkData.concat(Array.from(this._calculatedCompressedValue.bytes));
         break;
     }
 
