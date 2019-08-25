@@ -113,7 +113,10 @@ export default class IdatChunk {
       return {value: fixedHuffmanCode.value << 4 | (val - 67) % 16, bitlen: fixedHuffmanCode.bitlen + 4};
     } else if( val <= 257 ) {
       const fixedHuffmanCode = this._getFixedHuffmanCode(val + 150 - (val - 131 - Math.floor((val - 131) / 32)));
-      return {value: fixedHuffmanCode.value << 5 | (val - 258) % 32, bitlen: fixedHuffmanCode.bitlen + 5};
+      return {value: fixedHuffmanCode.value << 5 | (val - 131) % 32, bitlen: fixedHuffmanCode.bitlen + 5};
+    } else if( val === 258 ) {
+      const fixedHuffmanCode = this._getFixedHuffmanCode(285);
+      return fixedHuffmanCode;
     }
   }
 
@@ -134,7 +137,7 @@ export default class IdatChunk {
       const fixedHuffmanCode = this._getFixedHuffmanCode(val - 23 - (val - 33 - Math.floor((val - 33) / 16)));
       return {value: fixedHuffmanCode.value << 4 | (val - 33) % 16, bitlen: fixedHuffmanCode.bitlen + 4};
     } else if( val <= 128 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 53 - (val - 65 - Math.floor((val - 65) / 32)));
+      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 52 - (val - 65 - Math.floor((val - 65) / 32)));
       return {value: fixedHuffmanCode.value << 5 | (val - 65) % 32, bitlen: fixedHuffmanCode.bitlen + 5};
     } else if( val <= 256 ) {
       const fixedHuffmanCode = this._getFixedHuffmanCode(val - 115 - (val - 129 - Math.floor((val - 129) / 64)));
@@ -176,13 +179,13 @@ export default class IdatChunk {
     const windowSize = Math.min(this.slideWindowSize, cursor - this._getStartWindowCursor(cursor));
     const inWindowData = this.data.slice(this._getStartWindowCursor, windowSize);
 
-    let findOffset = 0;
+    let findOffset = inWindowData.length - 1;
     let foundCursor = -1;
     let maxFoundCount = -1;
 
-    while(true) {
+    while(findOffset >= 1) {
       let foundCount = 0;
-      const firstCursor = inWindowData.indexOf(buffer[0], findOffset);
+      const firstCursor = inWindowData.lastIndexOf(buffer[0], findOffset);
       if( firstCursor < 0 ) break;
 
       for(let i=1; i<buffer.length; i++) {
@@ -200,7 +203,7 @@ export default class IdatChunk {
         break;
       }
 
-      findOffset = firstCursor + 1;
+      findOffset = firstCursor - 1;
     }
 
      return {
@@ -236,15 +239,17 @@ export default class IdatChunk {
           let currentWord = buffer;
           let offsetStartCursor = 0;
 
-          while(currentWord.length > 1) {
+          while(currentWord.length > 0) {
             const foundResult = this._findInWindow(currentWord, startCursor + offsetStartCursor);
             if( foundResult.cursor >= 0 && foundResult.length >= 3 ) {
+              const dist = startCursor + offsetStartCursor - foundResult.cursor;
               const lengthCode = this._getLengthCode(foundResult.length);
-              const distCode = this._getDistanceCode(startCursor + offsetStartCursor - foundResult.cursor);
+              const distCode = this._getDistanceCode(dist);
               bytes.writeNonBoundary(lengthCode.value, lengthCode.bitlen);
               bytes.writeNonBoundary(distCode.value, distCode.bitlen);
+              console.log(`compressed: pos: ${startCursor + offsetStartCursor} , length: ${foundResult.length} , dist: ${dist}`);
               currentWord.splice(0, foundResult.length);
-              offsetStartCursor+=foundResult.length;
+              offsetStartCursor += foundResult.length;
               bitCounter += lengthCode.bitlen + distCode.bitlen;
             } else {
               const code = this._getFixedHuffmanCode(currentWord[0]);
@@ -253,12 +258,6 @@ export default class IdatChunk {
               currentWord.splice(0, 1);
               offsetStartCursor++;
             }
-          }
-
-          for( let i=0; i<currentWord.length; i++ ) {
-            const code = this._getFixedHuffmanCode(currentWord[i]);
-            bytes.writeNonBoundary(code.value, code.bitlen);
-            bitCounter += code.bitlen;
           }
 
           n--;
