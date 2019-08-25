@@ -122,47 +122,33 @@ export default class IdatChunk {
 
   _getDistanceCode(val) {
     if( val <= 4 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 1);
-      return fixedHuffmanCode;
+      return {value: val - 1, bitlen: 5};
     } else if( val <= 8 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 1 - (val - 5 - Math.floor((val - 5) / 2)));
-      return {value: fixedHuffmanCode.value << 1 | (val - 5) % 2, bitlen: fixedHuffmanCode.bitlen + 1};
+      return {value: (val - 1 - (val - 5 - Math.floor((val - 5) / 2))) << 1 | (val - 5) % 2, bitlen: 6};
     } else if( val <= 16 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 3 - (val - 9 - Math.floor((val - 9) / 4)));
-      return {value: fixedHuffmanCode.value << 2 | (val - 9) % 4, bitlen: fixedHuffmanCode.bitlen + 2};
+      return {value: (val - 3 - (val - 9 - Math.floor((val - 9) / 4))) << 2 | (val - 9) % 4, bitlen: 7};
     } else if( val <= 32 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 9 - (val - 17 - Math.floor((val - 17) / 8)));
-      return {value: fixedHuffmanCode.value << 3 | (val - 17) % 8, bitlen: fixedHuffmanCode.bitlen + 3};
+      return {value: (val - 9 - (val - 17 - Math.floor((val - 17) / 8))) << 3 | (val - 17) % 8, bitlen: 8};
     } else if( val <= 64 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 23 - (val - 33 - Math.floor((val - 33) / 16)));
-      return {value: fixedHuffmanCode.value << 4 | (val - 33) % 16, bitlen: fixedHuffmanCode.bitlen + 4};
+      return {value: (val - 23 - (val - 33 - Math.floor((val - 33) / 16))) << 4 | (val - 33) % 16, bitlen: 9};
     } else if( val <= 128 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 52 - (val - 65 - Math.floor((val - 65) / 32)));
-      return {value: fixedHuffmanCode.value << 5 | (val - 65) % 32, bitlen: fixedHuffmanCode.bitlen + 5};
+      return {value: (val - 52 - (val - 65 - Math.floor((val - 65) / 32))) << 5 | (val - 65) % 32, bitlen: 10};
     } else if( val <= 256 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 115 - (val - 129 - Math.floor((val - 129) / 64)));
-      return {value: fixedHuffmanCode.value << 6 | (val - 129) % 64, bitlen: fixedHuffmanCode.bitlen + 6};
+      return {value: (val - 115 - (val - 129 - Math.floor((val - 129) / 64))) << 6 | (val - 129) % 64, bitlen: 11};
     } else if( val <= 512 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 241 - (val - 257 - Math.floor((val - 257) / 128)));
-      return {value: fixedHuffmanCode.value << 7 | (val - 257) % 128, bitlen: fixedHuffmanCode.bitlen + 7};
+      return {value: (val - 241 - (val - 257 - Math.floor((val - 257) / 128))) << 7 | (val - 257) % 128, bitlen: 12};
     } else if( val <= 1024 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 495 - (val - 513 - Math.floor((val - 513) / 256)));
-      return {value: fixedHuffmanCode.value << 8 | (val - 513) % 256, bitlen: fixedHuffmanCode.bitlen + 8};
+      return {value: (val - 495 - (val - 513 - Math.floor((val - 513) / 256))) << 8 | (val - 513) % 256, bitlen: 13};
     } else if( val <= 2048 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 1005 - (val - 1025 - Math.floor((val - 1025) / 512)));
-      return {value: fixedHuffmanCode.value << 9 | (val - 1025) % 512, bitlen: fixedHuffmanCode.bitlen + 9};
+      return {value: (val - 1005 - (val - 1025 - Math.floor((val - 1025) / 512))) << 9 | (val - 1025) % 512, bitlen: 14};
     } else if( val <= 4096 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 2027 - (val - 2049 - Math.floor((val - 2049) / 1024)));
-      return {value: fixedHuffmanCode.value << 10 | (val - 2049) % 1024, bitlen: fixedHuffmanCode.bitlen + 10};
+      return {value: (val - 2027 - (val - 2049 - Math.floor((val - 2049) / 1024))) << 10 | (val - 2049) % 1024, bitlen: 15};
     } else if( val <= 8192 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 4073 - (val - 4097 - Math.floor((val - 4097) / 2048)));
-      return {value: fixedHuffmanCode.value << 11 | (val - 4097) % 2048, bitlen: fixedHuffmanCode.bitlen + 11};
+      return {value: (val - 4073 - (val - 4097 - Math.floor((val - 4097) / 2048))) << 11 | (val - 4097) % 2048, bitlen: 16};
     } else if( val <= 16384 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 8167 - (val - 8193 - Math.floor((val - 8193) / 4096)));
-      return {value: fixedHuffmanCode.value << 12 | (val - 8193) % 4096, bitlen: fixedHuffmanCode.bitlen + 12};
+      return {value: (val - 8167 - (val - 8193 - Math.floor((val - 8193) / 4096))) << 12 | (val - 8193) % 4096, bitlen: 17};
     } else if( val <= 32768 ) {
-      const fixedHuffmanCode = this._getFixedHuffmanCode(val - 16357 - (val - 16385 - Math.floor((val - 16385) / 8192)));
-      return {value: fixedHuffmanCode.value << 13 | (val - 16385) % 8192, bitlen: fixedHuffmanCode.bitlen + 13};
+      return {value: (val - 16357 - (val - 16385 - Math.floor((val - 16385) / 8192))) << 13 | (val - 16385) % 8192, bitlen: 18};
     }
   }
 
@@ -247,7 +233,6 @@ export default class IdatChunk {
               const distCode = this._getDistanceCode(dist);
               bytes.writeNonBoundary(lengthCode.value, lengthCode.bitlen);
               bytes.writeNonBoundary(distCode.value, distCode.bitlen);
-              console.log(`compressed: pos: ${startCursor + offsetStartCursor} , length: ${foundResult.length} , dist: ${dist}`);
               currentWord.splice(0, foundResult.length);
               offsetStartCursor += foundResult.length;
               bitCounter += lengthCode.bitlen + distCode.bitlen;
