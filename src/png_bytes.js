@@ -17,17 +17,20 @@ export default class PngBytes {
     }
   }
 
-  reverse(start = 0, end = this.bytes.length) {
+  static reverse(bytes, start = 0, end = bytes.length) {
+    let convertedBytes = [];
     for( let i=start; i<end; i++ ) {
-      let v = this.bytes[i];
+      let v = bytes[i];
       v = ((v >> 1) & 0x55) | ((v & 0x55) << 1);
       v = ((v >> 2) & 0x33) | ((v & 0x33) << 2);
       v = (v >> 4) | (v << 4);
-      this.bytes[i] = v;
+      convertedBytes.push(v & 0xFF);
     }
+
+    return convertedBytes;
   }
 
-  writeNonBoundary(data, bitlen) {
+  writeNonBoundary(data, bitlen, isLsb = false) {
     const cycle = Math.ceil((bitlen + this.offset) / 8);
     const bitLengthInlastByte = (this.offset + bitlen) % 8;
 
@@ -36,15 +39,23 @@ export default class PngBytes {
     let currentBitlen = bitlen;
 
     for(let i=0; i<cycle; i++) {
-      let putValue = buf >>> Math.max(currentBitlen - (8 - offset), 0);
-      if( i === cycle-1 && bitLengthInlastByte > 0) {
-        putValue = putValue << (8 - bitLengthInlastByte);
+      let putValue;
+
+      putValue = buf >>> Math.max(currentBitlen - (8 - offset), 0);
+
+      if (i === cycle-1 && bitLengthInlastByte > 0) {
+        if( isLsb ) {
+          putValue = putValue & Math.pow(2, Math.max(8 - bitLengthInlastByte, 0)) - 1;
+        } else {
+          putValue = putValue << (8 - bitLengthInlastByte);
+        }
       }
 
       this.bytes[this.cursor++] |= putValue;
 
       const removedBitlen = 8 - offset;
       currentBitlen -= removedBitlen;
+
       buf &= Math.pow(2, currentBitlen + 1) - 1;
 
       offset = 0;
