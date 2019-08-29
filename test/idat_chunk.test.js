@@ -58,56 +58,71 @@ describe('_getLengthCode', () => {
   test('return a length code', () => {
     const chunk = new IdatChunk([]);
 
-    expect(chunk._getLengthCode(3)).toEqual({value: chunk._getFixedHuffmanCode(257).value, bitlen: 7});
-    expect(chunk._getLengthCode(4)).toEqual({value: chunk._getFixedHuffmanCode(258).value, bitlen: 7});
-    expect(chunk._getLengthCode(10)).toEqual({value: chunk._getFixedHuffmanCode(264).value, bitlen: 7});
-    expect(chunk._getLengthCode(11)).toEqual({value: chunk._getFixedHuffmanCode(265).value << 1 | 0x00, bitlen: 8});
-    expect(chunk._getLengthCode(12)).toEqual({value: chunk._getFixedHuffmanCode(265).value << 1 | 0x01, bitlen: 8});
-    expect(chunk._getLengthCode(13)).toEqual({value: chunk._getFixedHuffmanCode(266).value << 1 | 0x00, bitlen: 8});
-    expect(chunk._getLengthCode(14)).toEqual({value: chunk._getFixedHuffmanCode(266).value << 1 | 0x01, bitlen: 8});
-    expect(chunk._getLengthCode(15)).toEqual({value: chunk._getFixedHuffmanCode(267).value << 1 | 0x00, bitlen: 8});
-    expect(chunk._getLengthCode(16)).toEqual({value: chunk._getFixedHuffmanCode(267).value << 1 | 0x01, bitlen: 8});
-    expect(chunk._getLengthCode(17)).toEqual({value: chunk._getFixedHuffmanCode(268).value << 1 | 0x00, bitlen: 8});
-    expect(chunk._getLengthCode(18)).toEqual({value: chunk._getFixedHuffmanCode(268).value << 1 | 0x01, bitlen: 8});
-    expect(chunk._getLengthCode(19)).toEqual({value: chunk._getFixedHuffmanCode(269).value << 2 | 0x00, bitlen: 9});
-    expect(chunk._getLengthCode(20)).toEqual({value: chunk._getFixedHuffmanCode(269).value << 2 | 0x01, bitlen: 9});
-    expect(chunk._getLengthCode(21)).toEqual({value: chunk._getFixedHuffmanCode(269).value << 2 | 0x02, bitlen: 9});
-    expect(chunk._getLengthCode(22)).toEqual({value: chunk._getFixedHuffmanCode(269).value << 2 | 0x03, bitlen: 9});
-    expect(chunk._getLengthCode(23)).toEqual({value: chunk._getFixedHuffmanCode(270).value << 2 | 0x00, bitlen: 9});
-    expect(chunk._getLengthCode(24)).toEqual({value: chunk._getFixedHuffmanCode(270).value << 2 | 0x01, bitlen: 9});
-    expect(chunk._getLengthCode(25)).toEqual({value: chunk._getFixedHuffmanCode(270).value << 2 | 0x02, bitlen: 9});
-    expect(chunk._getLengthCode(26)).toEqual({value: chunk._getFixedHuffmanCode(270).value << 2 | 0x03, bitlen: 9});
-    expect(chunk._getLengthCode(27)).toEqual({value: chunk._getFixedHuffmanCode(271).value << 2 | 0x00, bitlen: 9});
-    expect(chunk._getLengthCode(28)).toEqual({value: chunk._getFixedHuffmanCode(271).value << 2 | 0x01, bitlen: 9});
-    expect(chunk._getLengthCode(29)).toEqual({value: chunk._getFixedHuffmanCode(271).value << 2 | 0x02, bitlen: 9});
-    expect(chunk._getLengthCode(30)).toEqual({value: chunk._getFixedHuffmanCode(271).value << 2 | 0x03, bitlen: 9});
+    expect(chunk._getLengthCode(3)).toEqual({value: chunk._getFixedHuffmanCode(257).value, extraCode: 0, bitlen: 7, extraCodeBitLen: 0});
+    expect(chunk._getLengthCode(4)).toEqual({value: chunk._getFixedHuffmanCode(258).value, extraCode: 0, bitlen: 7, extraCodeBitLen: 0});
+    expect(chunk._getLengthCode(10)).toEqual({value: chunk._getFixedHuffmanCode(264).value, extraCode: 0, bitlen: 7, extraCodeBitLen: 0});
+    expect(chunk._getLengthCode(11)).toEqual({value: chunk._getFixedHuffmanCode(265).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(12)).toEqual({value: chunk._getFixedHuffmanCode(265).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(13)).toEqual({value: chunk._getFixedHuffmanCode(266).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(14)).toEqual({value: chunk._getFixedHuffmanCode(266).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(15)).toEqual({value: chunk._getFixedHuffmanCode(267).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(16)).toEqual({value: chunk._getFixedHuffmanCode(267).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(17)).toEqual({value: chunk._getFixedHuffmanCode(268).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(18)).toEqual({value: chunk._getFixedHuffmanCode(268).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 1});
+    expect(chunk._getLengthCode(19)).toEqual({value: chunk._getFixedHuffmanCode(269).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(20)).toEqual({value: chunk._getFixedHuffmanCode(269).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(21)).toEqual({value: chunk._getFixedHuffmanCode(269).value, extraCode: 0x02, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(22)).toEqual({value: chunk._getFixedHuffmanCode(269).value, extraCode: 0x03, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(23)).toEqual({value: chunk._getFixedHuffmanCode(270).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(24)).toEqual({value: chunk._getFixedHuffmanCode(270).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(25)).toEqual({value: chunk._getFixedHuffmanCode(270).value, extraCode: 0x02, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(26)).toEqual({value: chunk._getFixedHuffmanCode(270).value, extraCode: 0x03, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(27)).toEqual({value: chunk._getFixedHuffmanCode(271).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(28)).toEqual({value: chunk._getFixedHuffmanCode(271).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(29)).toEqual({value: chunk._getFixedHuffmanCode(271).value, extraCode: 0x02, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(30)).toEqual({value: chunk._getFixedHuffmanCode(271).value, extraCode: 0x03, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(31)).toEqual({value: chunk._getFixedHuffmanCode(272).value, extraCode: 0x00, bitlen: 7, extraCodeBitLen: 2});
+    expect(chunk._getLengthCode(68)).toEqual({value: chunk._getFixedHuffmanCode(277).value, extraCode: 0x01, bitlen: 7, extraCodeBitLen: 4});
   });
 });
 
 describe('_getDistanceCode', () => {
   test('return a distance code', () => {
     const chunk = new IdatChunk([]);
-    expect(chunk._getDistanceCode(1)).toEqual({value: 0x00, bitlen: 5});
-    expect(chunk._getDistanceCode(2)).toEqual({value: 0x01, bitlen: 5});
-    expect(chunk._getDistanceCode(3)).toEqual({value: 0x02, bitlen: 5});
-    expect(chunk._getDistanceCode(4)).toEqual({value: 0x03, bitlen: 5});
-    expect(chunk._getDistanceCode(5)).toEqual({value: 0x04 << 1 | 0x00, bitlen: 6});
-    expect(chunk._getDistanceCode(6)).toEqual({value: 0x04 << 1 | 0x01, bitlen: 6});
-    expect(chunk._getDistanceCode(7)).toEqual({value: 0x05 << 1 | 0x00, bitlen: 6});
-    expect(chunk._getDistanceCode(8)).toEqual({value: 0x05 << 1 | 0x01, bitlen: 6});
-    expect(chunk._getDistanceCode(9)).toEqual({value: 0x06 << 2 | 0x00, bitlen: 7});
-    expect(chunk._getDistanceCode(10)).toEqual({value: 0x06 << 2 | 0x01, bitlen: 7});
-    expect(chunk._getDistanceCode(11)).toEqual({value: 0x06 << 2 | 0x02, bitlen: 7});
-    expect(chunk._getDistanceCode(12)).toEqual({value: 0x06 << 2 | 0x03, bitlen: 7});
-    expect(chunk._getDistanceCode(13)).toEqual({value: 0x07 << 2 | 0x00, bitlen: 7});
-    expect(chunk._getDistanceCode(14)).toEqual({value: 0x07 << 2 | 0x01, bitlen: 7});
-    expect(chunk._getDistanceCode(15)).toEqual({value: 0x07 << 2 | 0x02, bitlen: 7});
-    expect(chunk._getDistanceCode(16)).toEqual({value: 0x07 << 2 | 0x03, bitlen: 7});
-    expect(chunk._getDistanceCode(17)).toEqual({value: 0x08 << 3 | 0x00, bitlen: 8});
-    expect(chunk._getDistanceCode(18)).toEqual({value: 0x08 << 3 | 0x01, bitlen: 8});
-    expect(chunk._getDistanceCode(19)).toEqual({value: 0x08 << 3 | 0x02, bitlen: 8});
-    expect(chunk._getDistanceCode(20)).toEqual({value: 0x08 << 3 | 0x03, bitlen: 8});
+    expect(chunk._getDistanceCode(1)).toEqual({value: 0x00, extraCode: 0, bitlen: 5, extraCodeBitLen: 0});
+    expect(chunk._getDistanceCode(2)).toEqual({value: 0x01, extraCode: 0, bitlen: 5, extraCodeBitLen: 0});
+    expect(chunk._getDistanceCode(3)).toEqual({value: 0x02, extraCode: 0, bitlen: 5, extraCodeBitLen: 0});
+    expect(chunk._getDistanceCode(4)).toEqual({value: 0x03, extraCode: 0, bitlen: 5, extraCodeBitLen: 0});
+    expect(chunk._getDistanceCode(5)).toEqual({value: 0x04, extraCode: 0x00, bitlen: 5, extraCodeBitLen: 1});
+    expect(chunk._getDistanceCode(6)).toEqual({value: 0x04, extraCode: 0x01, bitlen: 5, extraCodeBitLen: 1});
+    expect(chunk._getDistanceCode(7)).toEqual({value: 0x05, extraCode: 0x00, bitlen: 5, extraCodeBitLen: 1});
+    expect(chunk._getDistanceCode(8)).toEqual({value: 0x05, extraCode: 0x01, bitlen: 5, extraCodeBitLen: 1});
+    expect(chunk._getDistanceCode(9)).toEqual({value: 0x06, extraCode: 0x00, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(10)).toEqual({value: 0x06, extraCode: 0x01, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(11)).toEqual({value: 0x06, extraCode: 0x02, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(12)).toEqual({value: 0x06, extraCode: 0x03, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(13)).toEqual({value: 0x07, extraCode: 0x00, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(14)).toEqual({value: 0x07, extraCode: 0x01, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(15)).toEqual({value: 0x07, extraCode: 0x02, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(16)).toEqual({value: 0x07, extraCode: 0x03, bitlen: 5, extraCodeBitLen: 2});
+    expect(chunk._getDistanceCode(17)).toEqual({value: 0x08, extraCode: 0x00, bitlen: 5, extraCodeBitLen: 3});
+    expect(chunk._getDistanceCode(18)).toEqual({value: 0x08, extraCode: 0x01, bitlen: 5, extraCodeBitLen: 3});
+    expect(chunk._getDistanceCode(19)).toEqual({value: 0x08, extraCode: 0x02, bitlen: 5, extraCodeBitLen: 3});
+    expect(chunk._getDistanceCode(20)).toEqual({value: 0x08, extraCode: 0x03, bitlen: 5, extraCodeBitLen: 3});
+    expect(chunk._getDistanceCode(31)).toEqual({value: 0x09, extraCode: 0x06, bitlen: 5, extraCodeBitLen: 3});
+    expect(chunk._getDistanceCode(82)).toEqual({value: 0x0c, extraCode: 0x11, bitlen: 5, extraCodeBitLen: 5});
   });
+});
+
+describe('_inWindowData', () => {
+  test('return bytes in the window', () => {
+    const chunk = new IdatChunk([
+      0xAA, 0x00, 0xFF, 0x00, 0xF0, 0x0F, 0x00, 0xFF, 0x00, 0xB0, 0xB0, 0x0F,
+      0xF0, 0x0F, 0x00, 0xFF, 0x04
+    ]);
+    
+    expect(chunk._inWindowData(4)).toEqual([0xAA, 0x00, 0xFF, 0x00]);
+  })
 });
 
 describe('compress', () => {
@@ -125,16 +140,23 @@ describe('compress', () => {
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xF0).value, chunk._getFixedHuffmanCode(0xF0).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x0F).value, chunk._getFixedHuffmanCode(0x0F).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getLengthCode(3).value, chunk._getLengthCode(3).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getDistanceCode(5).value, chunk._getDistanceCode(5).bitlen);
+    const lengthCode1 = chunk._getLengthCode(3);
+    const distCode1 = chunk._getDistanceCode(5);
+    expectedBytes.writeNonBoundary(lengthCode1.value, lengthCode1.bitlen);
+    expectedBytes.writeNonBoundary(lengthCode1.extraCode, lengthCode1.extraCodeBitLen);
+    expectedBytes.writeNonBoundary(distCode1.value, distCode1.bitlen);
+    expectedBytes.writeNonBoundary(distCode1.extraCode, distCode1.extraCodeBitLen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xB0).value, chunk._getFixedHuffmanCode(0xB0).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xB0).value, chunk._getFixedHuffmanCode(0xB0).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x0F).value, chunk._getFixedHuffmanCode(0x0F).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getLengthCode(4).value, chunk._getLengthCode(4).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getDistanceCode(8).value, chunk._getDistanceCode(8).bitlen);
+    const lengthCode2 = chunk._getLengthCode(4);
+    const distCode2 = chunk._getDistanceCode(8);
+    expectedBytes.writeNonBoundary(lengthCode2.value, lengthCode2.bitlen);
+    expectedBytes.writeNonBoundary(lengthCode2.extraCode, lengthCode2.extraCodeBitLen);
+    expectedBytes.writeNonBoundary(distCode2.value, distCode2.bitlen);
+    expectedBytes.writeNonBoundary(distCode2.extraCode, distCode2.extraCodeBitLen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x04).value, chunk._getFixedHuffmanCode(0x04).bitlen);
     expectedBytes.writeNonBoundary(0x00, 7);
-    expectedBytes.reverse();
     expectedBytes.write(chunk._adler32());
 
     expect(chunk.compress().bytes.toString()).toEqual(expectedBytes.bytes.toString());
@@ -154,11 +176,14 @@ describe('compress', () => {
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x01).value, chunk._getFixedHuffmanCode(0x01).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x01).value, chunk._getFixedHuffmanCode(0x01).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getLengthCode(3).value, chunk._getLengthCode(3).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getDistanceCode(3).value, chunk._getDistanceCode(3).bitlen);
+    const lengthCode = chunk._getLengthCode(3);
+    const distCode = chunk._getDistanceCode(3);
+    expectedBytes.writeNonBoundary(lengthCode.value, lengthCode.bitlen);
+    expectedBytes.writeNonBoundary(lengthCode.extraCode, lengthCode.extraCodeBitLen);
+    expectedBytes.writeNonBoundary(distCode.value, distCode.bitlen);
+    expectedBytes.writeNonBoundary(distCode.extraCode, distCode.extraCodeBitLen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x01).value, chunk._getFixedHuffmanCode(0x01).bitlen);
     expectedBytes.writeNonBoundary(0x00, 7);
-    expectedBytes.reverse();
     expectedBytes.write(chunk._adler32());
 
     expect(chunk.compress().bytes.toString()).toEqual(expectedBytes.bytes.toString());
@@ -174,7 +199,6 @@ describe('compress', () => {
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
     expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
     expectedBytes.writeNonBoundary(0x00, 7);
-    expectedBytes.reverse();
     expectedBytes.write(chunk._adler32());
 
     expect(chunk.compress().bytes.toString()).toEqual(expectedBytes.bytes.toString());
