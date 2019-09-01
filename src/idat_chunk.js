@@ -173,7 +173,7 @@ export default class IdatChunk {
       const firstCursor = inWindowData.lastIndexOf(buffer[0], findOffset);
       if( firstCursor < 0 ) break;
 
-      for(let i=1; i<buffer.length; i++) {
+      for(let i=1; i<Math.min(buffer.length, 258); i++) {
         if( inWindowData[firstCursor + i] === buffer[i] ) {
           foundCount++;
         } else {
