@@ -126,63 +126,79 @@ describe('_inWindowData', () => {
 });
 
 describe('compress', () => {
-  test('return a compressed data', () => {
-    const chunk = new IdatChunk([
-      0xAA, 0x00, 0xFF, 0x00, 0xF0, 0x0F, 0x00, 0xFF, 0x00, 0xB0, 0xB0, 0x0F,
-      0xF0, 0x0F, 0x00, 0xFF, 0x04
-    ]);
+  test('return a compressed data (17 bytes)', () => {
+    const rawData = [
+      0xAA, 0x00, 0xFF, 0x00,
+      0xF0, 0x0F, 0x00, 0xFF,
+      0x00, 0xB0, 0xB0, 0x0F,
+      0xF0, 0x0F, 0x00, 0xFF,
+      0x04
+    ];
+    const chunk = new IdatChunk(rawData);
+    const codes = rawData.map( val => chunk._getFixedHuffmanCode(val) );
     const expectedBytes = new PngBytes(20);
 
-    expectedBytes.writeNonBoundary(0b110, 3);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xAA).value, chunk._getFixedHuffmanCode(0xAA).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xFF).value, chunk._getFixedHuffmanCode(0xFF).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xF0).value, chunk._getFixedHuffmanCode(0xF0).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x0F).value, chunk._getFixedHuffmanCode(0x0F).bitlen);
+    expectedBytes.writeNonBoundary(0b011, 3, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[0].value, codes[0].bitlen), codes[0].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[1].value, codes[1].bitlen), codes[1].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[2].value, codes[2].bitlen), codes[2].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[3].value, codes[3].bitlen), codes[3].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[4].value, codes[4].bitlen), codes[4].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[5].value, codes[5].bitlen), codes[5].bitlen, true);
+
     const lengthCode1 = chunk._getLengthCode(3);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(lengthCode1.value, lengthCode1.bitlen), lengthCode1.bitlen, true);
+    expectedBytes.writeNonBoundary(lengthCode1.extraCode, lengthCode1.extraCodeBitLen, true);
+
     const distCode1 = chunk._getDistanceCode(5);
-    expectedBytes.writeNonBoundary(lengthCode1.value, lengthCode1.bitlen);
-    expectedBytes.writeNonBoundary(lengthCode1.extraCode, lengthCode1.extraCodeBitLen);
-    expectedBytes.writeNonBoundary(distCode1.value, distCode1.bitlen);
-    expectedBytes.writeNonBoundary(distCode1.extraCode, distCode1.extraCodeBitLen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xB0).value, chunk._getFixedHuffmanCode(0xB0).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0xB0).value, chunk._getFixedHuffmanCode(0xB0).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x0F).value, chunk._getFixedHuffmanCode(0x0F).bitlen);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(distCode1.value, distCode1.bitlen), distCode1.bitlen, true);
+    expectedBytes.writeNonBoundary(distCode1.extraCode, distCode1.extraCodeBitLen, true);
+
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[9].value, codes[9].bitlen), codes[9].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[10].value, codes[10].bitlen), codes[10].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[11].value, codes[11].bitlen), codes[11].bitlen, true);
+
     const lengthCode2 = chunk._getLengthCode(4);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(lengthCode2.value, lengthCode2.bitlen), lengthCode2.bitlen, true);
+    expectedBytes.writeNonBoundary(lengthCode2.extraCode, lengthCode2.extraCodeBitLen, true);
+
     const distCode2 = chunk._getDistanceCode(8);
-    expectedBytes.writeNonBoundary(lengthCode2.value, lengthCode2.bitlen);
-    expectedBytes.writeNonBoundary(lengthCode2.extraCode, lengthCode2.extraCodeBitLen);
-    expectedBytes.writeNonBoundary(distCode2.value, distCode2.bitlen);
-    expectedBytes.writeNonBoundary(distCode2.extraCode, distCode2.extraCodeBitLen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x04).value, chunk._getFixedHuffmanCode(0x04).bitlen);
-    expectedBytes.writeNonBoundary(0x00, 7);
-    expectedBytes.write(chunk._adler32());
+    expectedBytes.writeNonBoundary(PngBytes.reverse(distCode2.value, distCode2.bitlen), distCode2.bitlen, true);
+    expectedBytes.writeNonBoundary(distCode2.extraCode, distCode2.extraCodeBitLen, true);
+
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[16].value, codes[16].bitlen), codes[16].bitlen, true);
+    expectedBytes.writeNonBoundary(0x00, 7, true);
+    expectedBytes.write(chunk._adler32(), 4, true);
 
     expect(chunk.compress().bytes.toString()).toEqual(expectedBytes.bytes.toString());
   });
 
   test('return a compressed data (2x3 png pattern)', () => {
-    const chunk = new IdatChunk([
+    const rawData = [
       0x00, 0x00, 0x01,
       0x00, 0x01, 0x01,
       0x00, 0x01, 0x01
-    ]);
+    ];
     const expectedBytes = new PngBytes(13);
+    const chunk = new IdatChunk(rawData);
+    const codes = rawData.map( val => chunk._getFixedHuffmanCode(val) );
 
-    expectedBytes.writeNonBoundary(0b110, 3);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x01).value, chunk._getFixedHuffmanCode(0x01).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x01).value, chunk._getFixedHuffmanCode(0x01).bitlen);
+    expectedBytes.writeNonBoundary(0b011, 3, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[0].value, codes[0].bitlen), codes[0].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[1].value, codes[1].bitlen), codes[1].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[2].value, codes[2].bitlen), codes[2].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[3].value, codes[3].bitlen), codes[3].bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[4].value, codes[4].bitlen), codes[4].bitlen, true);
+
     const lengthCode = chunk._getLengthCode(3);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(lengthCode.value, lengthCode.bitlen), lengthCode.bitlen, true);
+    expectedBytes.writeNonBoundary(lengthCode.extraCode, lengthCode.extraCodeBitLen, true);
+
     const distCode = chunk._getDistanceCode(3);
-    expectedBytes.writeNonBoundary(lengthCode.value, lengthCode.bitlen);
-    expectedBytes.writeNonBoundary(lengthCode.extraCode, lengthCode.extraCodeBitLen);
-    expectedBytes.writeNonBoundary(distCode.value, distCode.bitlen);
-    expectedBytes.writeNonBoundary(distCode.extraCode, distCode.extraCodeBitLen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x01).value, chunk._getFixedHuffmanCode(0x01).bitlen);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(distCode.value, distCode.bitlen), distCode.bitlen, true);
+    expectedBytes.writeNonBoundary(distCode.extraCode, distCode.extraCodeBitLen, true);
+
+    expectedBytes.writeNonBoundary(PngBytes.reverse(codes[8].value, codes[8].bitlen), codes[8].bitlen, true);
     expectedBytes.writeNonBoundary(0x00, 7);
     expectedBytes.write(chunk._adler32());
 
@@ -194,10 +210,11 @@ describe('compress', () => {
       0x00, 0x00
     ]);
     const expectedBytes = new PngBytes(8);
+    const code = chunk._getFixedHuffmanCode(0x00);
 
-    expectedBytes.writeNonBoundary(0b110, 3);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
-    expectedBytes.writeNonBoundary(chunk._getFixedHuffmanCode(0x00).value, chunk._getFixedHuffmanCode(0x00).bitlen);
+    expectedBytes.writeNonBoundary(0b011, 3, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(code.value, code.bitlen), code.bitlen, true);
+    expectedBytes.writeNonBoundary(PngBytes.reverse(code.value, code.bitlen), code.bitlen, true);
     expectedBytes.writeNonBoundary(0x00, 7);
     expectedBytes.write(chunk._adler32());
 

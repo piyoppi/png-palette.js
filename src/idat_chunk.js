@@ -52,7 +52,7 @@ export default class IdatChunk {
   }
 
   get slideWindowSize() {
-    return Math.pow(this.slideWindowMode + 8, 2);
+    return Math.pow(2, this.slideWindowMode + 8);
   }
 
   get rawDataLength() {
@@ -204,19 +204,17 @@ export default class IdatChunk {
     let bitCounter = 0;
 
     const write = (code) => {
-      bytes.writeNonBoundary(code.value, code.bitlen);
+      bytes.writeNonBoundary(PngBytes.reverse(code.value, code.bitlen), code.bitlen, true);
       bitCounter += code.bitlen;
-      if( code.extraCode !== undefined ) {
-        bytes.writeNonBoundary(code.extraCode, code.extraCodeBitLen);
+      if( typeof code.extraCode !== 'undefined' ) {
+        bytes.writeNonBoundary(code.extraCode, code.extraCodeBitLen, true);
         bitCounter += code.extraCodeBitLen;
       }
     };
 
     const bfinal = 1;
-    write({value: bfinal, bitlen: 1})
-    write({value: 0x02, bitlen: 2})
-
-    //console.log(this.data.toString());
+    write({value: bfinal, bitlen: 1});
+    write({value: 0x02, bitlen: 2});
 
     write(this._getFixedHuffmanCode(this.data[0]));
 
@@ -228,25 +226,21 @@ export default class IdatChunk {
       buffer.push(this.data[n]);
 
       if( foundBytePosition < 0 || (n === this.data.length - 1) ) {
-        if( n > 230 || buffer.length <= 3 ) {
+        if( buffer.length <= 3 ) {
           for( let i=0; i<buffer.length; i++ ) {
-            //console.log(`wrote non-compress : ${buffer.length}, foundPos: ${foundBytePosition}, n: ${n}`);
             write(this._getFixedHuffmanCode(buffer[i]));
           }
         } else {
           const lastByte = buffer.splice(buffer.length - 1, 1)[0];
           let currentWord = buffer;
           let offsetStartCursor = 0;
-          let cnt = 0;
 
           while(currentWord.length > 0) {
             const foundResult = this._findInWindow(currentWord, startCursor + offsetStartCursor);
             if( foundResult.cursor >= 0 && foundResult.length >= 3 ) {
-              cnt++
               const dist = startCursor + offsetStartCursor - foundResult.cursor;
               write(this._getLengthCode(foundResult.length));
               write(this._getDistanceCode(dist))
-              //console.log(`compressed: val: ${currentWord} , n : ${n} , bufferLen: ${buffer.length} , pos: ${startCursor} , ofs: ${offsetStartCursor} , length: ${foundResult.length} , dist: ${dist}`);
               currentWord.splice(0, foundResult.length);
               offsetStartCursor += foundResult.length;
             } else {
