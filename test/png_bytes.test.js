@@ -2,17 +2,12 @@ import PngBytes from './../src/png_bytes';
 
 describe('reverse', () => {
   test('converted to lsb', () => {
-    expect(PngBytes.reverse([
-      0b10101010,
-      0b11110000,
-      0b10010011,
-      0b00111100,
-    ]).toString()).toEqual([
-      0b01010101,
-      0b00001111,
-      0b11001001,
-      0b00111100
-    ].toString());
+    expect(PngBytes.reverse(0b10101010, 8)).toEqual(0b01010101);
+    expect(PngBytes.reverse(0b1100, 4)).toEqual(0b0011);
+    expect(PngBytes.reverse(0b0000000010010011, 16)).toEqual(0b1100100100000000);
+    expect(PngBytes.reverse(0b0000000000111100, 16)).toEqual(0b0011110000000000);
+    expect(PngBytes.reverse(1, 1)).toEqual(1);
+    expect(PngBytes.reverse(1, 2)).toEqual(0b10);
   });
 });
 
@@ -25,15 +20,49 @@ describe('writeNonBoundary', () => {
       expect(data.bytes.toString()).toEqual([0b00001100].toString());
     });
 
+    test('written bytes when bitlen is 1 bytes', () => {
+      const data = new PngBytes(1);
+      data.writeNonBoundary(0b11000, 5, true);
+      data.writeNonBoundary(0b110, 3, true);
+
+      expect(data.bytes.toString()).toEqual([0b11011000].toString());
+    });
+
+    test('written bytes when bitlen is 3 bits', () => {
+      const data = new PngBytes(1);
+      data.writeNonBoundary(1, 1, true);
+      data.writeNonBoundary(0b10, 2, true);
+
+      expect(data.bytes.toString()).toEqual([0b00000101].toString());
+    });
+
+    test('written bytes when bitlen is 11 bits', () => {
+      const data = new PngBytes(2);
+      data.writeNonBoundary(1, 1, true);
+      data.writeNonBoundary(0b10, 2, true);
+      data.writeNonBoundary(0b00110000, 8, true);
+
+      expect(data.bytes.toString()).toEqual([0b10000101, 0b00000001].toString());
+    });
+
     test('written bytes when bitlen is 3/2 bytes', () => {
       const data = new PngBytes(2);
       data.writeNonBoundary(0x123, 12, true);
 
-      expect(data.bytes.toString()).toEqual([0x12, 0x03].toString());
+      expect(data.bytes.toString()).toEqual([0x23, 0x01].toString());
     });
   });
 
   describe('padding from msb', () => {
+    test('written bytes when bitlen is 3 bits', () => {
+      const data = new PngBytes(1);
+      data.writeNonBoundary(1, 1);
+      data.writeNonBoundary(0b10, 2);
+      data.writeNonBoundary(0b111, 3);
+
+      expect(data.bytes.toString()).toEqual([0b11011100].toString());
+    });
+
     test('written bytes when offset is zero', () => {
       const data = new PngBytes(1);
       data.writeNonBoundary(0x12, 8);
