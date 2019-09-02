@@ -4,6 +4,8 @@ export default class Deflate {
   constructor(data, slideWindowSize) {
     this.data = data;
     this.slideWindowSize = slideWindowSize;
+
+    this.compressedDataBits = 0;
   }
 
   _getStartWindowCursor(cursor) {
@@ -122,24 +124,24 @@ export default class Deflate {
     }
   }
 
+  _write(bytes, code) {
+    bytes.writeNonBoundary(PngBytes.reverse(code.value, code.bitlen), code.bitlen, true);
+    this.compressedDataBits += code.bitlen;
+    if( typeof code.extraCode !== 'undefined' ) {
+      bytes.writeNonBoundary(code.extraCode, code.extraCodeBitLen, true);
+      this.compressedDataBits += code.extraCodeBitLen;
+    }
+  }
+
   compress(offsetSize = 0) {
     const bytes = new PngBytes(6 + this.data.length);
-    let bitCounter = 0;
-
-    const write = (code) => {
-      bytes.writeNonBoundary(PngBytes.reverse(code.value, code.bitlen), code.bitlen, true);
-      bitCounter += code.bitlen;
-      if( typeof code.extraCode !== 'undefined' ) {
-        bytes.writeNonBoundary(code.extraCode, code.extraCodeBitLen, true);
-        bitCounter += code.extraCodeBitLen;
-      }
-    };
+    this.compressedDataBits = 0;
 
     const bfinal = 1;
-    write({value: bfinal, bitlen: 1});
-    write({value: 0x02, bitlen: 2});
+    this._write(bytes, {value: bfinal, bitlen: 1});
+    this._write(bytes, {value: 0x02, bitlen: 2});
 
-    write(this._getFixedHuffmanCode(this.data[0]));
+    this._write(bytes, this._getFixedHuffmanCode(this.data[0]));
 
     let buffer = [];
     for( let n=1; n<this.data.length; n++ ) {
@@ -151,28 +153,26 @@ export default class Deflate {
       if( foundBytePosition < 0 || (n === this.data.length - 1) ) {
         if( buffer.length <= 3 ) {
           for( let i=0; i<buffer.length; i++ ) {
-            write(this._getFixedHuffmanCode(buffer[i]));
+            this._write(bytes, this._getFixedHuffmanCode(buffer[i]));
           }
         } else {
           const lastByte = buffer.splice(buffer.length - 1, 1)[0];
-          let currentWord = buffer;
           let offsetStartCursor = 0;
 
-          while(currentWord.length > 0) {
-            const foundResult = this._findInWindow(currentWord, startCursor + offsetStartCursor);
+          while(buffer.length > 0) {
+            const foundResult = this._findInWindow(buffer, startCursor + offsetStartCursor);
             if( foundResult.cursor >= 0 && foundResult.length >= 3 ) {
               const dist = startCursor + offsetStartCursor - foundResult.cursor;
-              write(this._getLengthCode(foundResult.length));
-              write(this._getDistanceCode(dist))
-              currentWord.splice(0, foundResult.length);
+              this._write(bytes, this._getLengthCode(foundResult.length));
+              this._write(bytes, this._getDistanceCode(dist))
+              buffer.splice(0, foundResult.length);
               offsetStartCursor += foundResult.length;
             } else {
-              write(this._getFixedHuffmanCode(currentWord[0]));
-              currentWord.splice(0, 1);
+              this._write(bytes, this._getFixedHuffmanCode(buffer[0]));
+              buffer.splice(0, 1);
               offsetStartCursor++;
             }
           }
-
           n--;
         }
 
@@ -180,9 +180,9 @@ export default class Deflate {
       }
     }
     
-    write({value: 0x00, bitlen: 7})
+    this._write(bytes, {value: 0x00, bitlen: 7});
 
-    const byteLength = Math.ceil(bitCounter / 8) + offsetSize;
+    const byteLength = Math.ceil(this.compressedDataBits / 8) + offsetSize;
     const resultBytes = new PngBytes(byteLength);
     resultBytes.write(bytes.bytes, byteLength);
 
