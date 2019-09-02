@@ -1,4 +1,5 @@
 # png-palette.js
+[![CircleCI](https://circleci.com/gh/piyoppi/png-palette.js.svg?style=svg)](https://circleci.com/gh/piyoppi/png-palette.js)
 
 PNGファイルをブラウザ上で加工するためのライブラリ（を目指しています）
 
