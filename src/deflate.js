@@ -50,7 +50,7 @@ export default class Deflate {
     }
 
      return {
-       cursor: foundCursor,
+       cursor: this._getStartWindowCursor(cursor) + foundCursor,
        length: maxFoundCount + 1
      };
   }
