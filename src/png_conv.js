@@ -42,7 +42,7 @@ export default class PngConv {
     const idhrChunk = new IdhrChunk(this.png.width, this.png.height, 8, ColorType.palette | ColorType.color);
     const plteChunk = new PlteChunk(this.png.palette);
     const trnsChunk = new TrnsChunk(this.png.palette);
-    const idatChunk = new IdatChunk(this.png.rawData, {dataMode: DeflateDataType.fixedHuffman});
+    const idatChunk = new IdatChunk(this.png.rawData, {dataMode: DeflateDataType.raw});
     const iendChunk = new IendChunk();
 
     const byteLength = 8 + idhrChunk.length + plteChunk.length + trnsChunk.length + idatChunk.length + iendChunk.length;

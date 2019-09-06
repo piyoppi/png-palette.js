@@ -17,11 +17,11 @@ describe('_extractColors', () => {
     const png = new Png(pixels, 3, 3);
     const extractedColors = png._extractColors();
     expect(extractedColors.length).toEqual(5);
-    expect(extractedColors).toContainEqual({r: 0x00, g: 0x00, b: 0x00});
-    expect(extractedColors).toContainEqual({r: 0xFF, g: 0x00, b: 0x00});
-    expect(extractedColors).toContainEqual({r: 0x00, g: 0xFF, b: 0x00});
-    expect(extractedColors).toContainEqual({r: 0x00, g: 0x00, b: 0xFF});
-    expect(extractedColors).toContainEqual({r: 0x00, g: 0xF0, b: 0x00});
+    expect(extractedColors).toContainEqual({r: 0x00, g: 0x00, b: 0x00, a: 0xFF});
+    expect(extractedColors).toContainEqual({r: 0xFF, g: 0x00, b: 0x00, a: 0xFF});
+    expect(extractedColors).toContainEqual({r: 0x00, g: 0xFF, b: 0x00, a: 0xFF});
+    expect(extractedColors).toContainEqual({r: 0x00, g: 0x00, b: 0xFF, a: 0xFF});
+    expect(extractedColors).toContainEqual({r: 0x00, g: 0xF0, b: 0x00, a: 0xFF});
   });
 });
 
