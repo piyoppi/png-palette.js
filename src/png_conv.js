@@ -1,6 +1,7 @@
 import PngBytes from './png_bytes';
 import IdhrChunk, {ColorType} from './idhr_chunk';
 import PlteChunk from './plte_chunk';
+import TrnsChunk from './trns_chunk';
 import IdatChunk, {DeflateDataType} from './idat_chunk';
 import IendChunk from './iend_chunk';
 import Png from './png'
@@ -40,15 +41,17 @@ export default class PngConv {
   fileData() {
     const idhrChunk = new IdhrChunk(this.png.width, this.png.height, 8, ColorType.palette | ColorType.color);
     const plteChunk = new PlteChunk(this.png.palette);
-    const idatChunk = new IdatChunk(this.png.rawData, {dataMode: DeflateDataType.raw});
+    const trnsChunk = new TrnsChunk(this.png.palette);
+    const idatChunk = new IdatChunk(this.png.rawData, {dataMode: DeflateDataType.fixedHuffman});
     const iendChunk = new IendChunk();
 
-    const byteLength = 8 + idhrChunk.length + plteChunk.length + idatChunk.length + iendChunk.length;
+    const byteLength = 8 + idhrChunk.length + plteChunk.length + trnsChunk.length + idatChunk.length + iendChunk.length;
     const bytes = new PngBytes(byteLength);
 
     bytes.write(this._pngSignature());
     idhrChunk.write(bytes);
     plteChunk.write(bytes);
+    trnsChunk.write(bytes);
     idatChunk.write(bytes);
     iendChunk.write(bytes);
 

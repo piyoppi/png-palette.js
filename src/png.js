@@ -15,9 +15,9 @@ export default class Png {
     for( let y = 0; y < this.height; y++ ) {
       for( let x = 0; x < this.width; x++ ) {
         const idx = ((y * this.width) + x) * 4;
-        const key = `${pixels[idx]},${pixels[idx+1]},${pixels[idx+2]}`;
+        const key = `${pixels[idx]},${pixels[idx+1]},${pixels[idx+2]},${pixels[idx+3]}`;
         if( !(key in colorList) ){
-          colorList[key] = { r: pixels[idx], g: pixels[idx+1], b: pixels[idx+2] };
+          colorList[key] = { r: pixels[idx], g: pixels[idx+1], b: pixels[idx+2], a: pixels[idx+3] };
         }
       }
     }
