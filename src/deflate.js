@@ -182,8 +182,8 @@ export default class Deflate {
     
     this._write(bytes, {value: 0x00, bitlen: 7});
 
-    const byteLength = Math.ceil(this.compressedDataBits / 8) + offsetSize;
-    const resultBytes = new PngBytes(byteLength);
+    const byteLength = Math.ceil(this.compressedDataBits / 8);
+    const resultBytes = new PngBytes(byteLength + offsetSize);
     resultBytes.write(bytes.bytes, byteLength);
 
     return resultBytes;
